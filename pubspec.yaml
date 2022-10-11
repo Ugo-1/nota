@@ -1,0 +1,51 @@
+name: nota
+description: A new Flutter project.
+
+publish_to: 'none' # Remove this line if you wish to publish to pub.dev
+version: 1.0.0+1
+
+environment:
+  sdk: ">=2.17.0 <3.0.0"
+
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  cupertino_icons: ^1.0.2
+  sqflite: ^2.0.3
+  intl: ^0.17.0
+  flutter_screenutil: ^5.5.3+2
+  flutter_native_splash: ^2.2.9
+  google_fonts: ^3.0.1
+  font_awesome_flutter: ^10.1.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+  flutter_lints: ^2.0.0
+  flutter_launcher_icons: "^0.9.2"
+
+flutter_icons:
+  image_path: "assets/icons/launcher_icon.png"
+  android: "launcher_icon"
+  ios: true
+  remove_alpha_ios: true
+  adaptive_icon_background: "assets/icons/launcher_background.png"
+  adaptive_icon_foreground: "assets/icons/launcher_foreground.png"
+
+flutter_native_splash:
+  image: "assets/images/light_splash.png"
+  image_dark: "assets/images/dark_splash.png"
+  color: "#FFFFFF"
+  color_dark: "#000000"
+
+
+
+flutter:
+  uses-material-design: true
+
+  assets:
+    - assets/images/
+    - google-fonts/
