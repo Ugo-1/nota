@@ -1,16 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:nota/utilities/theme_data.dart';
-import 'package:nota/views/home_screen.dart';
+import 'package:nota/core/services/locator_services.dart';
+import 'package:nota/core/services/navigation_service.dart';
+import 'package:nota/core/utilities/app_router.dart';
+import 'package:nota/core/utilities/theme_data.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
+  setupLocator();
   SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
     DeviceOrientation.portraitDown,
   ]);
 
-  runApp(const NotaApp());
+  runApp(
+    const NotaApp(),
+  );
 }
 
 class NotaApp extends StatelessWidget {
@@ -22,8 +27,9 @@ class NotaApp extends StatelessWidget {
       theme: kLightTheme,
       darkTheme: kDarkTheme,
       debugShowCheckedModeBanner: false,
-      home: const HomeScreen(),
+      navigatorKey: navigatorKey,
+      initialRoute: AppRoute.allNotes,
+      onGenerateRoute: AppRoute().onGenerateRoute,
     );
   }
 }
-

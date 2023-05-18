@@ -1,32 +1,35 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:intl/intl.dart';
-import 'package:nota/utilities/size_manager.dart';
-import 'package:nota/model/nota_model.dart';
-import 'package:nota/utilities/colors_constant.dart';
+import 'package:nota/core/model/nota_model.dart';
+import 'package:nota/core/model/note_detail_model.dart';
+import 'package:nota/core/utilities/app_colors.dart';
+import 'package:nota/core/utilities/extension_int.dart';
+import 'package:nota/core/utilities/size_manager.dart';
 
 class NoteDetail extends StatefulWidget {
+  ///The note if any
   final Nota? nota;
 
   const NoteDetail({Key? key, this.nota,}) : super(key: key);
 
   @override
-  _NoteDetailState createState() => _NoteDetailState();
+  State<NoteDetail> createState() => _NoteDetailState();
 }
 
 class _NoteDetailState extends State<NoteDetail> {
   final _formKey = GlobalKey<FormState>();
 
-  late List<String> useColor;
-  late Color bgColor;
-
+  ///The note
   late Nota? note;
+  ///If the note is a favorite
   late bool isFavorite;
+  ///The title of the note
   late String title;
+  ///The description or details about the note
   late String description;
-
-  String lightColor = '0xFFF6F6F6';
-  String darkColor = '0xFF6F6F6F';
+  ///The color of the note
+  late int? noteColor;
 
   @override
   void initState() {
@@ -40,42 +43,24 @@ class _NoteDetailState extends State<NoteDetail> {
       isFavorite = note!.isFavorite;
       title = note!.title;
       description = note!.description;
-      lightColor = note!.color!;
-      darkColor = note!.darkColor!;
+      noteColor = note!.colorIndex;
     }
     else {
       note = null;
       title = '';
       description = '';
       isFavorite = false;
-    }
-  }
-
-  void colorSetter(){
-    if (MediaQuery.of(context).platformBrightness == Brightness.light) {
-      if (widget.nota == null){
-        bgColor = Color(int.parse(lightColor));
-      } else {
-        bgColor = Color(int.parse(lightColor));
-      }
-      useColor = kStringLightColorList;
-    } else if (MediaQuery.of(context).platformBrightness == Brightness.dark) {
-      if (widget.nota == null){
-        bgColor = Color(int.parse(darkColor));
-      } else {
-        bgColor = Color(int.parse(darkColor));
-      }
-      useColor = kStringDarkColorList;
+      noteColor = null;
     }
   }
 
 
   @override
   Widget build(BuildContext context) {
-    colorSetter();
+    final AppColors appColors = Theme.of(context).extension<AppColors>()!;
     SizeMg.init(context);
     return Scaffold(
-      backgroundColor: bgColor,
+      backgroundColor: noteColor.getNoteColor(appColors),
       body: WillPopScope(
         onWillPop: () async {
           _validator();
@@ -136,7 +121,7 @@ class _NoteDetailState extends State<NoteDetail> {
                           textCapitalization: TextCapitalization.sentences,
                           initialValue: title,
                           maxLines: 1,
-                          style: Theme.of(context).textTheme.headline3!.copyWith(
+                          style: Theme.of(context).textTheme.displaySmall!.copyWith(
                                 fontSize: SizeMg.text(25.0),
                                 letterSpacing: 0.6,
                               ),
@@ -161,7 +146,7 @@ class _NoteDetailState extends State<NoteDetail> {
                             Text(
                               "Last Opened",
                               style:
-                                  Theme.of(context).textTheme.bodyText1!.copyWith(
+                                  Theme.of(context).textTheme.bodyLarge!.copyWith(
                                         fontSize: SizeMg.text(16.0),
                                         letterSpacing: 0.4,
                                       ),
@@ -173,7 +158,7 @@ class _NoteDetailState extends State<NoteDetail> {
                               DateFormat('dd MMMM yyyy, hh:mm aa').format(
                                   note?.createdTime ?? DateTime.now()),
                               style:
-                                  Theme.of(context).textTheme.headline3!.copyWith(
+                                  Theme.of(context).textTheme.displaySmall!.copyWith(
                                         fontWeight: FontWeight.w600,
                                         fontSize: SizeMg.text(16.0),
                                         letterSpacing: 0.4,
@@ -188,7 +173,7 @@ class _NoteDetailState extends State<NoteDetail> {
                             maxLines: null,
                             textCapitalization: TextCapitalization.sentences,
                             initialValue: description,
-                            style: Theme.of(context).textTheme.bodyText2!.copyWith(
+                            style: Theme.of(context).textTheme.bodyMedium!.copyWith(
                                   fontSize: SizeMg.text(18.0),
                                   letterSpacing: 0.6,
                                 ),
@@ -233,6 +218,7 @@ class _NoteDetailState extends State<NoteDetail> {
       isScrollControlled: true,
       backgroundColor: Colors.grey.shade300,
       builder: (context) {
+        final AppColors appColors = Theme.of(context).extension<AppColors>()!;
         return SizedBox(
           height: SizeMg.height(100.0),
           child: ListView.separated(
@@ -241,7 +227,7 @@ class _NoteDetailState extends State<NoteDetail> {
               right: SizeMg.width(15.0),
             ),
             scrollDirection: Axis.horizontal,
-            itemCount: useColor.length,
+            itemCount: noteColorsLength,
             separatorBuilder: (BuildContext context, int index) => SizedBox(
               width: SizeMg.width(13.0),
             ),
@@ -253,13 +239,12 @@ class _NoteDetailState extends State<NoteDetail> {
                     shape: BoxShape.circle,
                   ),
                   child: CircleAvatar(
-                    backgroundColor: Color(int.parse(useColor[index])),
+                    backgroundColor: index.getNoteColor(appColors),
                   ),
                 ),
                 onTap: (){
                   setState(() {
-                    lightColor = kStringLightColorList[index];
-                    darkColor = kStringDarkColorList[index];
+                    noteColor = index;
                   });
                   Navigator.pop(context);
                 },
@@ -275,45 +260,43 @@ class _NoteDetailState extends State<NoteDetail> {
     if (_formKey.currentState?.validate() ?? false){
 
       if (note != null) {
-        Map<String, dynamic> json = {
-          'validate': 'true',
-          'nota': note!.copy(
+        NoteDetailValidateModel model = NoteDetailValidateModel(
+          validate: true,
+          nota: note!.copy(
             isFavorite: isFavorite,
-            color: lightColor,
-            darkColor: darkColor,
+            colorIndex: noteColor,
             title: title,
             description: description,
             createdTime: DateTime.now(),
           ),
-          'update': 'true',
-        };
-        pop(command: json);
+          update: true,
+        );
+        pop(command: model,);
       } else {
-        Map<String, dynamic> json = {
-          'validate': 'true',
-          'nota': Nota(
-            color: lightColor,
-            darkColor: darkColor,
+        NoteDetailValidateModel model = NoteDetailValidateModel(
+          validate: true,
+          nota: Nota(
+            colorIndex: noteColor,
             isFavorite: isFavorite,
             title: title,
             description: description,
             createdTime: DateTime.now(),
           ),
-          'update': 'false',
-        };
-        pop(command: json);
+          update: false,
+        );
+        pop(command: model,);
       }
     } else {
-      Map<String, dynamic> json = {
-        'validate': 'false',
-        'nota': 'null',
-        'update': 'false',
-      };
-      pop(command: json);
+      NoteDetailValidateModel model = const NoteDetailValidateModel(
+        validate: false,
+        nota: null,
+        update: false,
+      );
+      pop(command: model,);
     }
   }
 
-  void pop({required Map command}){
+  void pop({required NoteDetailValidateModel command}){
     Navigator.of(context).pop(command);
   }
 }

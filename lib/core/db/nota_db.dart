@@ -1,6 +1,6 @@
+import 'package:nota/core/model/nota_model.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
-import 'package:nota/model/nota_model.dart';
 
 class NotaDatabase{
   static final NotaDatabase instance = NotaDatabase._init();
@@ -26,9 +26,10 @@ class NotaDatabase{
     const String idType = 'INTEGER PRIMARY KEY AUTOINCREMENT';
     const String boolType = 'BOOLEAN NOT NULL';
     const String textType = 'TEXT NOT NULL';
+    const String intType = 'INTEGER';
 
     await db.execute(
-    'CREATE TABLE $tableName (${NoteFields.id} $idType, ${NoteFields.color} $textType, ${NoteFields.darkColor} $textType, ${NoteFields.isFavorite} $boolType, ${NoteFields.title} $textType, ${NoteFields.description} $textType, ${NoteFields.createdTime} $textType)');
+    'CREATE TABLE $tableName (${NoteFields.id} $idType, ${NoteFields.colorIndex} $intType, ${NoteFields.isFavorite} $boolType, ${NoteFields.title} $textType, ${NoteFields.description} $textType, ${NoteFields.createdTime} $textType)');
   }
 
   Future<Nota> create (Nota nota) async {
@@ -38,22 +39,6 @@ class NotaDatabase{
     return nota.copy(id: id);
   }
 
-  // Future<Nota> readNota(int id) async {
-  //   final db = await instance.dataBase;
-  //   final maps = await db.query(
-  //     tableName,
-  //     columns: NoteFields.columns,
-  //     where: '${NoteFields.id} = ?',
-  //     whereArgs: [id],
-  //   );
-  //
-  //   if (maps.isNotEmpty) {
-  //     return Nota.fromJson(maps.first);
-  //   } else {
-  //     throw Exception('ID number $id not found');
-  //   }
-  // }
-
   Future<List<Nota>> readAll() async {
     final db = await instance.dataBase;
     final maps = await db.query(tableName);
@@ -61,7 +46,7 @@ class NotaDatabase{
     if (maps.isNotEmpty){
       return maps.map((dataRow) => Nota.fromJson(dataRow)).toList();
     } else {
-      throw Exception('No note');
+      return [];
     }
   }
 

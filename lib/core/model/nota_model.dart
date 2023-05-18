@@ -2,8 +2,7 @@ const String tableName = 'nota';
 
 class NoteFields {
   static String id = '_id';
-  static String color = 'color';
-  static String darkColor = 'darkColor';
+  static String colorIndex = 'colorIndex';
   static String isFavorite = 'isFavorite';
   static String title ='title';
   static String description = 'description';
@@ -11,8 +10,7 @@ class NoteFields {
 
   static List<String> columns = [
     id,
-    color,
-    darkColor,
+    colorIndex,
     isFavorite,
     title,
     description,
@@ -22,8 +20,7 @@ class NoteFields {
 
 class Nota{
   final int? id;
-  final String? color;
-  final String? darkColor;
+  final int? colorIndex;
   final bool isFavorite;
   final String title;
   final String description;
@@ -31,8 +28,7 @@ class Nota{
 
   const Nota({
     this.id,
-    this.color,
-    this.darkColor,
+    this.colorIndex,
     required this.isFavorite,
     required this.title,
     required this.description,
@@ -41,8 +37,7 @@ class Nota{
 
   Nota copy({
     int? id,
-    String? color,
-    String? darkColor,
+    int? colorIndex,
     bool? isFavorite,
     String? title,
     String? description,
@@ -50,8 +45,7 @@ class Nota{
   }) {
     return Nota(
       id: id ?? this.id,
-      color: color ?? this.color,
-      darkColor: darkColor ?? this.darkColor,
+      colorIndex: colorIndex ?? this.colorIndex,
       isFavorite: isFavorite ?? this.isFavorite,
       title: title ?? this.title,
       description: description ?? this.description,
@@ -62,8 +56,7 @@ class Nota{
   factory Nota.fromJson(Map<String, dynamic> json){
     return Nota(
       id: json[NoteFields.id] as int,
-      color: json[NoteFields.color] as String,
-      darkColor: json[NoteFields.darkColor] as String,
+      colorIndex: json[NoteFields.colorIndex] as int?,
       isFavorite: json[NoteFields.isFavorite] as int == 1,
       title: json[NoteFields.title] as String,
       description: json[NoteFields.description] as String,
@@ -74,8 +67,7 @@ class Nota{
   Map<String, dynamic> toJson(){
     return {
       NoteFields.id: id,
-      NoteFields.color: color,
-      NoteFields.darkColor: darkColor,
+      NoteFields.colorIndex: colorIndex,
       NoteFields.isFavorite: isFavorite? 1:0,
       NoteFields.title: title,
       NoteFields.description: description,
