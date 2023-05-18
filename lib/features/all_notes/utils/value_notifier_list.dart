@@ -7,7 +7,7 @@ class ValueNotifierList<T> extends ValueNotifier<List<T>> {
 
   final NotaDatabase _instance = locator<NotaDatabase>();
 
-  Future addAllNotes() async {
+  void addAllNotes() async {
     final list = await _instance.readAll() as List<T>; // Cast the list to List<T>
     value = list;
   }

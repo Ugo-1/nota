@@ -40,8 +40,8 @@ class _AllNotesViewState extends State<AllNotesView> {
   }
 
   ///To read all the notes in the database
-  Future readAllNotes() async {
-    await _notaList.addAllNotes();
+  void readAllNotes() {
+    _notaList.addAllNotes();
   }
 
   @override
